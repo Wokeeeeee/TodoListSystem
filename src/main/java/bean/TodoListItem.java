@@ -8,12 +8,14 @@ public class TodoListItem {
     private Date start_time;
     private Date end_time;
     private String description;
+    private User user;
 
-    public TodoListItem(Date start_time, Date end_time, String description) {
+    public TodoListItem(Date start_time, Date end_time, String description,User user) {
         this.uuid = UUID.randomUUID().toString();
         this.start_time = start_time;
         this.end_time = end_time;
         this.description = description;
+        this.user=user;
     }
 
     public String getUuid() {
@@ -43,6 +45,14 @@ public class TodoListItem {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

@@ -1,7 +1,7 @@
 package client;
 
-import com.javaedu.TodoListService;
-import com.javaedu.TodoListServiceService;
+import com.javaedu.TodolistService;
+import com.javaedu.ToDoListServiceService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,14 +11,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Client {
-    private TodoListService todoListService;
-    private SimpleDateFormat myFmt = new SimpleDateFormat("yyyy/MM/dd/HH:mm");
+    private TodolistService todoListService;
     private String name;
     private String pwd;
 
 
     public Client() {
-        todoListService = new TodoListServiceService().getTodolistServicePort();
+        todoListService = new ToDoListServiceService().getTodolistPort();
         name = null;
         pwd = null;
     }
@@ -44,7 +43,12 @@ public class Client {
                     }
                     this.name = cmd[1];
                     this.pwd = cmd[2];
-                    System.out.println(todoListService.login(cmd[1], cmd[2]));
+                    String rec = todoListService.login(cmd[1], cmd[2]);
+                    System.out.println(rec);
+                    if (!rec.equals("LOGIN SUCCESS.")) {
+                        this.name = null;
+                        this.pwd = null;
+                    }
                 }
                 else if (cmd[0].equals("quit")) {
                     break;
@@ -60,27 +64,40 @@ public class Client {
                         System.out.println("AddItem ERROR: arguments wrong, correct arguments should be like add [start_time] [end_time] [descriptions]");
                         continue;
                     }
-                    Date start, end;
-                    try {
-                        start = myFmt.parse(cmd[1]);
-                        end = myFmt.parse(cmd[2]);
-                    } catch (ParseException ignored) {
-                        System.out.println("AddItem ERROR: date format should be like YY/MM/DD/HH:mm");
-                        continue;
-                    }
                     String desp = "";
                     for (int i = 3; i < cmd.length; i++) {
                         desp += cmd[i] + " ";
                     }
-                    System.out.println(todoListService.addItem(start, end, desp));
+                    System.out.println(todoListService.addItem(cmd[1], cmd[2], desp));
 
                 }
-                else if (cmd[0].equals("getItemList")){
+                else if (cmd[0].equals("getItemList")) {
                     System.out.println(todoListService.getItemList());
+                }
+                else if (cmd[0].equals("delete")) {
+                    if (cmd.length != 2) {
+                        System.out.println("DeleteItem ERROR: arguments wrong, correct arguments should be like delete [uuid]");
+                        break;
+                    }
+                    System.out.println(todoListService.deleteItem(cmd[1]));
+                }
+                else if (cmd[0].equals("query")) {
+                    if (cmd.length != 3) {
+                        System.out.println("queryItem ERROR: arguments wrong, correct arguments should be like query [start_time] [end_time]");
+                        break;
+                    }
+                    System.out.println(todoListService.queryItem(cmd[1], cmd[2]));
+                }
+                else if (cmd[0].equals("clear")) {
+                    System.out.println(todoListService.clearItem());
+                }
+                else if (cmd[0].equals("logout")) {
+                    this.name = null;
+                    this.pwd = null;
                 }
 
             }
-
+            System.out.println("\n\n\n");
         }
     }
 
@@ -125,7 +142,7 @@ public class Client {
                 .append("1.add todoList Item :  add [start_time] [end_time] [descriptions]\n")
                 .append("2.delete todoListItem : delete [item_id]\n")
                 .append("3.query todoListItem : query [start_time] [end_time]\n")
-                .append("4.clear todoListItem : clear")
+                .append("4.clear todoListItem : clear\n")
                 .append("5.getItemList : getItemList\n")
                 .append("6.logout\n")
                 .append("notes: time data formation should be like YYYY/MM/DD/HH:mm\n")
